@@ -1,6 +1,7 @@
 import sounddevice as sd
 import numpy as np
 import time
+import queue
 from threading import Event
 
 from utils import config, get_timestamp
@@ -79,7 +80,7 @@ class AudioWorker:
             # Put in queue
             try:
                 self.event_queue.put_nowait(event_data)
-            except:
+            except queue.Full:
                 pass  # Queue full, skip
                 
         except Exception as e:

@@ -28,7 +28,10 @@ function Dashboard() {
   }, [])
 
   const connectWebSocket = () => {
-    const ws = new WebSocket('ws://localhost:8000/ws/dashboard')
+    // Get API URL from environment or use localhost as default
+    const apiHost = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+    const wsUrl = apiHost.replace('http', 'ws') + '/ws/dashboard'
+    const ws = new WebSocket(wsUrl)
     wsRef.current = ws
 
     ws.onopen = () => {

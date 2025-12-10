@@ -1,5 +1,6 @@
 import asyncio
 import json
+import queue
 from datetime import datetime
 from typing import Set
 import threading
@@ -24,8 +25,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global Queue for worker communication
-event_queue = asyncio.Queue()
+# Global Queue for worker communication (thread-safe, not asyncio)
+event_queue = queue.Queue(maxsize=1000)
 
 # WebSocket connection manager
 class ConnectionManager:
@@ -92,8 +93,12 @@ async def process_events():
     """Process events from queue and broadcast to clients"""
     while True:
         try:
-            # Get event from queue
-            event_data = await event_queue.get()
+            # Get event from queue (non-blocking with timeout)
+            try:
+                event_data = event_queue.get(timeout=0.1)
+            except queue.Empty:
+                await asyncio.sleep(0.01)
+                continue
             
             # Add timestamp if not present
             if 'timestamp' not in event_data:

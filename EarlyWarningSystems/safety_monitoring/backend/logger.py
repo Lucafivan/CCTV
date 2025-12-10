@@ -78,21 +78,24 @@ class EventLogger:
                 self._flush_buffer()
     
     def _flush_buffer(self):
-        """Flush event buffer to database"""
+        """Flush event buffer to database (thread-safe)"""
         if not self.event_buffer:
             return
         
+        # Make a copy of buffer before flushing
+        events_to_flush = self.event_buffer.copy()
+        
         try:
             # Try SQLite first
-            self._flush_to_sqlite()
-            print(f"💾 Flushed {len(self.event_buffer)} events to database")
+            self._flush_to_sqlite(events_to_flush)
+            print(f"💾 Flushed {len(events_to_flush)} events to database")
             
         except Exception as e:
             print(f"⚠️ SQLite flush failed: {e}")
             try:
                 # Fallback to CSV
-                self._flush_to_csv()
-                print(f"💾 Flushed {len(self.event_buffer)} events to CSV")
+                self._flush_to_csv(events_to_flush)
+                print(f"💾 Flushed {len(events_to_flush)} events to CSV")
             except Exception as csv_error:
                 print(f"❌ CSV flush also failed: {csv_error}")
         
@@ -100,12 +103,15 @@ class EventLogger:
         self.event_buffer.clear()
         self.last_flush_time = datetime.now()
     
-    def _flush_to_sqlite(self):
+    def _flush_to_sqlite(self, events_to_flush=None):
         """Flush events to SQLite database"""
+        if events_to_flush is None:
+            events_to_flush = self.event_buffer
+            
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
-        for event in self.event_buffer:
+        for event in events_to_flush:
             timestamp = event.get('timestamp', get_timestamp())
             source = event.get('source', 'unknown')
             event_type = event.get('type', 'unknown')
@@ -121,8 +127,11 @@ class EventLogger:
         conn.commit()
         conn.close()
     
-    def _flush_to_csv(self):
+    def _flush_to_csv(self, events_to_flush=None):
         """Flush events to CSV file (fallback)"""
+        if events_to_flush is None:
+            events_to_flush = self.event_buffer
+            
         csv_filename = f"events_{get_date_string()}.csv"
         csv_path = os.path.join(self.log_dir, csv_filename)
         
@@ -135,7 +144,7 @@ class EventLogger:
             if not file_exists:
                 writer.writeheader()
             
-            for event in self.event_buffer:
+            for event in events_to_flush:
                 writer.writerow({
                     'timestamp': event.get('timestamp', get_timestamp()),
                     'source': event.get('source', 'unknown'),

@@ -1,6 +1,6 @@
 import cv2
 import time
-import asyncio
+import queue
 from threading import Thread, Event
 from typing import Optional
 
@@ -89,10 +89,10 @@ class CameraWorker:
                 'timestamp': get_timestamp()
             }
             
-            # Put in queue (non-blocking for sync code)
+            # Put in queue (non-blocking)
             try:
                 self.event_queue.put_nowait(event_data)
-            except:
+            except queue.Full:
                 pass  # Queue full, skip this frame
                 
         except Exception as e:
@@ -120,7 +120,7 @@ class CameraWorker:
             # Put in queue
             try:
                 self.event_queue.put_nowait(event_data)
-            except:
+            except queue.Full:
                 pass  # Queue full, skip this frame
                 
         except Exception as e:

@@ -10,17 +10,19 @@ services:
     volumes:
       - ./backend:/app
       - ./logs:/app/logs
-      - /dev/video0:/dev/video0  # Camera device
-      - /dev/video1:/dev/video1  # Camera device
-      - /dev/snd:/dev/snd        # Audio device
-    devices:
-      - /dev/video0:/dev/video0
-      - /dev/video1:/dev/video1
-      - /dev/snd:/dev/snd
+      # Note: Camera/Audio devices mounted below only work on Linux
+      # For Windows: use host network with --privileged or WSL2
+    devices: []
+      # Linux only:
+      # - /dev/video0:/dev/video0
+      # - /dev/video1:/dev/video1
+      # - /dev/snd:/dev/snd
     privileged: true
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
+    # For Windows, uncomment the line below to use host network
+    # network_mode: "host"
 
   frontend:
     build:
