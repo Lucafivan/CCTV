@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Models (large files)
+models/*.caffemodel
+models/*.weights
+models/*.h5
+models/*.pb
+models/*.pt
+models/*.pth
+models/*.onnx
+
+# Keep model directory but not the models
+!models/README.md
+
+# Temporary files
+*.tmp
+*.temp
+
+# Environment
+.env
+.env.local
+
+# CSV exports
+*.csv
+
+# Docker
+docker-compose.override.yml

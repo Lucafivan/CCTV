@@ -1,0 +1,14 @@
+{
+  "cam0_device": 0,
+  "cam10_device": 1,
+  "noise_threshold": 85,
+  "ppe_detection_enabled": true,
+  "accident_detection_enabled": true,
+  "log_interval_seconds": 60,
+  "camera_fps": 10,
+  "audio_sample_rate": 44100,
+  "audio_chunk_size": 2048,
+  "detection_confidence": 0.5,
+  "system_name": "Safety Monitoring System",
+  "timezone": "Asia/Jakarta"
+}
